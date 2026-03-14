@@ -7,6 +7,8 @@ description: Retrieve or request a user's personal data from major consumer serv
 
 Use direct Playwright browser actions against official portals to request or download a user's data. For live retrieval work, default to Playwright instead of building or running local project code unless the user explicitly asks for reusable automation.
 
+This skill is for live, in-progress browser work. When a step requires the user to type, click, solve a CAPTCHA, approve MFA, or enter a passcode in the browser, stop advancing and wait for the user to return to chat and say they are done. Do not auto-advance to the next step without that chat confirmation.
+
 Never ask the user to paste passwords, 2FA codes, or recovery codes into chat. Let the user enter secrets directly in the browser, then continue once they confirm the step is done.
 
 At the start of a multi-provider session, ask once for a reusable non-sensitive profile packet before opening portals:
@@ -19,24 +21,24 @@ At the start of a multi-provider session, ask once for a reusable non-sensitive 
 
 Do not ask for highly sensitive fields like SSN, driver's license number, passport number, tax IDs, or full payment details upfront. Only request those later when a specific official portal requires them to verify identity.
 
-Store any reusable personal profile packet only in `/tmp`, never in the current repo, the skill directory, or any tracked workspace file. Use a clear ephemeral path such as `/tmp/privacy-data-retrieval-profile.json` or a session-specific variant under `/tmp/`.
+Store any reusable personal profile packet only in `/tmp/privacy-data-retrieval-profile.json`, never in the current repo, the skill directory, or any tracked workspace file.
 
-Keep a separate ephemeral session log in `/tmp` as well, for example `/tmp/privacy-data-retrieval-log.json`. Record each provider's status plus any confirmation number, reference number, case ID, ticket ID, or feedback number shown by the portal.
+Keep a separate ephemeral session log only in `/tmp/privacy-data-retrieval-log.json`. Record each provider's status plus any confirmation number, reference number, case ID, ticket ID, or feedback number shown by the portal.
 
 ## Workflow
 
 1. Confirm the target list or choose a prioritized default order from [references/targets.md](references/targets.md).
 2. Ask for the reusable non-sensitive profile packet if it has not already been collected in the current session.
 3. If non-sensitive details are already visible in Playwright from the current or a prior provider, harvest and normalize them instead of asking the user again.
-4. Save the collected profile packet to an ephemeral file in `/tmp` for reuse during the session.
-5. If the user later gives a preferred or corrected value, overwrite the older non-sensitive value in the `/tmp` profile file.
-6. Initialize or update an ephemeral session log in `/tmp` for provider outcomes and reference numbers.
+4. Save the collected profile packet to `/tmp/privacy-data-retrieval-profile.json` for reuse during the session.
+5. If the user later gives a preferred or corrected value, overwrite the older non-sensitive value in `/tmp/privacy-data-retrieval-profile.json`.
+6. Initialize or update `/tmp/privacy-data-retrieval-log.json` for provider outcomes and reference numbers.
 7. Open the first official privacy/export portal in Playwright.
 8. Reuse the profile packet to reduce repeated questions and form-filling interruptions.
-9. If login, MFA, or identity confirmation is required, tell the user exactly what is needed in the browser.
-10. After giving that instruction, keep polling the browser state automatically for progress at 60-second intervals instead of waiting for a chat reply.
-11. If the gated step clears, continue immediately.
-12. Only ask the user for confirmation in chat if polling fails, the page is ambiguous, or the user must complete an external action such as clicking an email link.
+9. If login, MFA, identity confirmation, a one-time passcode, a CAPTCHA, or a form completion step is required, tell the user exactly what is needed in the browser.
+10. After giving that instruction, stop advancing and wait for the user to come back in chat and confirm the browser step is done.
+11. Once the user confirms, recheck the Playwright page and continue immediately if the gated step has cleared.
+12. If the page is ambiguous or the user must complete an external action such as clicking an email link, tell them the shortest exact next action.
 13. Request the broadest reasonable export:
    - Prefer `all time` over shorter date ranges.
    - Prefer machine-readable formats like `JSON` when offered.
@@ -46,7 +48,7 @@ Keep a separate ephemeral session log in `/tmp` as well, for example `/tmp/priva
    - `requested`, `queued`, `download ready`, `needs email confirmation`, or `blocked`.
 15. If the portal refuses the request because the user's state is ineligible or outside the covered privacy-rights states, record that state-based refusal in the `/tmp` session log and move on.
 16. Capture any visible confirmation number, record number, feedback number, or case ID into the `/tmp` session log before leaving the provider.
-17. Stay on the current provider until it reaches a real outcome: requested, queued, downloaded, blocked, state-ineligible, or explicitly skipped by the user.
+17. Stay on the current provider until it reaches a real outcome: requested, queued, downloaded, blocked, state-ineligible, or explicitly skipped by the user. Never move on just because the user is still typing in the browser.
 18. Tell the user the concrete result, then move to the next target without unnecessary recap.
 19. If a portal requires an external confirmation email, app approval, or device-only step, hand off the shortest actionable instruction and resume after the user confirms.
 20. When the session ends or the user asks, delete the `/tmp` profile file and `/tmp` session log.
@@ -65,7 +67,8 @@ Keep a separate ephemeral session log in `/tmp` as well, for example `/tmp/priva
 - If a provider denies access because the user's state does not qualify for that portal's privacy workflow, treat that as a terminal outcome, log it, and continue to the next provider.
 - If the portal exposes multiple profiles under one account, request exports for each relevant profile separately.
 - If a service blocks automation but is still usable manually, guide the user through the exact next click instead of abandoning the request.
-- After telling the user to sign in or complete MFA, poll Playwright automatically at 60-second intervals for page transitions, signed-in navigation, completed forms, or new export controls before asking the user anything else.
+- After telling the user to sign in, complete MFA, enter a passcode, solve a CAPTCHA, or finish a form, wait for the user to come back in chat before advancing.
+- During a live run, do not move to the next provider while the current one is waiting on a user-completed browser step.
 - Do not move to the next provider while the current one is still waiting on a login form, identity form, CAPTCHA, or similar gated step unless the user explicitly says to skip it.
 - If a site later demands a more sensitive verifier such as SSN or ID number, explain why that field is needed and keep collection limited to that portal's requirement.
 
@@ -73,9 +76,9 @@ Keep a separate ephemeral session log in `/tmp` as well, for example `/tmp/priva
 
 Use short, concrete handoffs:
 
-- `Sign in there, then tell me and I’ll continue.`
-- `Approve the 2FA prompt on your device, then tell me when it’s done.`
-- `Amazon emailed a confirmation link. Click it, then I’ll continue with the next portal.`
+- `Sign in there, then come back here and tell me when it’s done.`
+- `Approve the 2FA prompt on your device, then come back here and tell me when it’s done.`
+- `Amazon emailed a confirmation link. Click it, then come back here and I’ll continue with the next portal.`
 
 Avoid vague prompts like `let me know when ready`.
 
