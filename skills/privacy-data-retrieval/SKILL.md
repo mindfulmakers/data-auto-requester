@@ -51,7 +51,12 @@ Keep a separate ephemeral session log only in `/tmp/privacy-data-retrieval-log.j
 17. Stay on the current provider until it reaches a real outcome: requested, queued, downloaded, blocked, state-ineligible, or explicitly skipped by the user. Never move on just because the user is still typing in the browser.
 18. Tell the user the concrete result, then move to the next target without unnecessary recap.
 19. If a portal requires an external confirmation email, app approval, or device-only step, hand off the shortest actionable instruction and resume after the user confirms.
-20. When the session ends or the user asks, delete the `/tmp` profile file and `/tmp` session log.
+20. After the provider-request phase is complete, open Gmail in Playwright and check for provider emails related to confirmations, request tracking, or ready-for-download notices.
+21. If Gmail requires sign-in or MFA, let the user complete that in the browser and wait for them to return to chat before continuing.
+22. From Gmail, follow official provider emails to complete confirmation links, open tracking pages, or start archive downloads.
+23. Record any resulting confirmation IDs, download-ready states, download links followed, or final download outcomes in `/tmp/privacy-data-retrieval-log.json`.
+24. Treat the email follow-up phase as part of the same retrieval workflow. Do not stop at `requested` if the next required step is sitting in the user's inbox and can be completed through Playwright.
+25. When the session ends or the user asks, delete the `/tmp` profile file and `/tmp` session log.
 
 ## Operating Rules
 
@@ -64,6 +69,8 @@ Keep a separate ephemeral session log only in `/tmp/privacy-data-retrieval-log.j
 - Keep reusable personal details out of repos entirely. Store them only in `/tmp` and remove them when no longer needed.
 - Keep provider reference numbers out of repo files too. Store them in the `/tmp` session log with provider name and request status.
 - Do not claim a request is complete when the site still requires email confirmation, device approval, or delayed archive preparation.
+- After submitting requests, use Playwright to check the user's Gmail inbox for official provider follow-up emails when that is the next step needed to confirm or download the data.
+- In Gmail, only use official provider messages tied to the active retrieval workflow. Follow confirmation and download instructions there, then return to the provider flow as needed.
 - If a provider denies access because the user's state does not qualify for that portal's privacy workflow, treat that as a terminal outcome, log it, and continue to the next provider.
 - If the portal exposes multiple profiles under one account, request exports for each relevant profile separately.
 - If a service blocks automation but is still usable manually, guide the user through the exact next click instead of abandoning the request.
@@ -79,6 +86,7 @@ Use short, concrete handoffs:
 - `Sign in there, then come back here and tell me when it’s done.`
 - `Approve the 2FA prompt on your device, then come back here and tell me when it’s done.`
 - `Amazon emailed a confirmation link. Click it, then come back here and I’ll continue with the next portal.`
+- `Gmail is open now. Sign in there, then come back here and I’ll check the provider emails and continue the download steps.`
 
 Avoid vague prompts like `let me know when ready`.
 
@@ -89,6 +97,7 @@ Avoid vague prompts like `let me know when ready`.
 - Meta exports are per profile. Facebook and Instagram should be handled separately, and Facebook data logs are a separate request when available.
 - Amazon may allow a combined request, but often requires a confirmation link sent by email before the request is finalized.
 - Some services only expose partial data in browser and require on-device export, such as Apple Health.
+- Many providers finish the process by email. When that happens, use Gmail in Playwright to complete confirmations and trigger downloads rather than stopping at the original request page.
 
 ## Reference Files
 
