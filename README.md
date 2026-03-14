@@ -1,51 +1,46 @@
-# data-auto-requester
+# Agent Skills Repo
 
-`SPEC.md` makes one constraint clear: there is no single API that can retrieve everything. The practical route is an assisted browser workflow that opens each official export or privacy portal, lets you complete identity checks, and records what happened.
+This repository is now structured as an Agent Skills source repo in the style used by [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills).
 
-This project gives you that workflow with Playwright:
+## Included Skills
 
-- Opens the official portal for each high-value target from `SPEC.md`
-- Reuses a persistent Chromium profile so logins survive across runs
-- Captures downloads into `artifacts/downloads/`
-- Writes a request tracker to `artifacts/request-tracker.json` and `artifacts/request-tracker.csv`
-- Keeps all artifacts out of git via `.gitignore`
+- `privacy-data-retrieval`
+  - Drives official privacy/export portals with Playwright
+  - Handles user login and MFA handoffs safely in-browser
+  - Focuses on high-yield targets like Google, Apple, Meta, Amazon, Uber, and major privacy request portals
+
+## Repo Layout
+
+```text
+skills/
+  privacy-data-retrieval/
+    SKILL.md
+    agents/openai.yaml
+    references/targets.md
+```
 
 ## Install
 
+From a local checkout:
+
 ```bash
-npm install
-npx playwright install chromium
+npx skills add /Users/gabemontague/Projects/mindful-makers/code/data-auto-requester
 ```
 
-## Usage
-
-List the target catalog:
+From GitHub:
 
 ```bash
-npm run list
+npx skills add https://github.com/mindfulmakers/data-auto-requester
 ```
 
-Run the interactive browser flow for every target:
+Install a single skill directly:
 
 ```bash
-npm start
-```
-
-Run a subset:
-
-```bash
-npm start -- --only google,apple,uber
-```
-
-Smoke-test portal URLs headlessly:
-
-```bash
-npm run smoke -- --only google,apple,meta,uber
+npx skills add https://github.com/mindfulmakers/data-auto-requester/tree/main/skills/privacy-data-retrieval
 ```
 
 ## Notes
 
-- `apple-health` is intentionally treated as a manual export because Apple Health data is exported from the Health app on-device.
-- Some portals start from a privacy policy or help article because the actual request flow is account-gated or dynamically linked.
-- Some companies block headless browsers or bot-like traffic, so `npm run smoke` is a link check, not a guarantee that the interactive flow will be blocked in a normal headed browser.
-- Downloaded archives and tracker files can contain personal data, so they are written only under `artifacts/`.
+- The original discovery notes that informed this skill remain in `SPEC.md`.
+- The reusable skill lives under [`skills/privacy-data-retrieval`](/Users/gabemontague/Projects/mindful-makers/code/data-auto-requester/skills/privacy-data-retrieval).
+- The live browser workflow is encoded in the skill itself, not in repo-local Node tooling.

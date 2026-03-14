@@ -1,0 +1,4 @@
+interface:
+  display_name: "Privacy Data Retrieval"
+  short_description: "Drive privacy portal export requests"
+  default_prompt: "Use $privacy-data-retrieval to request and retrieve my personal data from major online services."
