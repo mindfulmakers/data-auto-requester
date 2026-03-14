@@ -21,16 +21,10 @@ skills/
 
 ## Install
 
-From a local checkout:
-
-```bash
-npx skills add /Users/gabemontague/Projects/mindful-makers/code/data-auto-requester
-```
-
 From GitHub:
 
 ```bash
-npx skills add https://github.com/mindfulmakers/data-auto-requester
+npx skills add https://github.com/mindfulmakers/data-auto-requester.git
 ```
 
 Install a single skill directly:
@@ -42,5 +36,5 @@ npx skills add https://github.com/mindfulmakers/data-auto-requester/tree/main/sk
 ## Notes
 
 - The original discovery notes that informed this skill remain in `SPEC.md`.
-- The reusable skill lives under [`skills/privacy-data-retrieval`](/Users/gabemontague/Projects/mindful-makers/code/data-auto-requester/skills/privacy-data-retrieval).
+- The reusable skill lives under `skills/privacy-data-retrieval`.
 - The live browser workflow is encoded in the skill itself, not in repo-local Node tooling.
