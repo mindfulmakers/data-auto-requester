@@ -24,13 +24,13 @@ skills/
 From GitHub:
 
 ```bash
-npx skills add https://github.com/mindfulmakers/data-auto-requester.git
+npx skills add https://github.com/mindfulmakers/data-trace.git
 ```
 
 Install a single skill directly:
 
 ```bash
-npx skills add https://github.com/mindfulmakers/data-auto-requester/tree/main/skills/privacy-data-retrieval
+npx skills add https://github.com/mindfulmakers/data-trace/tree/main/skills/privacy-data-retrieval
 ```
 
 ## Notes
