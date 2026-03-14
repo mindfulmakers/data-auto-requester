@@ -1,0 +1,25 @@
+{
+  "name": "data-auto-requester",
+  "version": "1.0.0",
+  "description": "Playwright runner for personal data export and DSAR workflows",
+  "scripts": {
+    "start": "node src/run.js",
+    "list": "node src/run.js --list",
+    "smoke": "node src/run.js --smoke"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindfulmakers/data-auto-requester.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mindfulmakers/data-auto-requester/issues"
+  },
+  "homepage": "https://github.com/mindfulmakers/data-auto-requester#readme",
+  "dependencies": {
+    "playwright": "^1.58.2"
+  },
+  "type": "module"
+}
